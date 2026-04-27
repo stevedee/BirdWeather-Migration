@@ -1,0 +1,858 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BirdWeather Species by Location</title>
+  <style>
+	  
+	html, body {
+	  background: #0b1020 !important;
+	  color: #eef3ff !important;
+	}	  
+    :root {
+      --bg: #0b1020;
+      --panel: #121933;
+      --panel-2: #182244;
+      --text: #eef3ff;
+      --muted: #aab7d6;
+      --accent: #77b3ff;
+      --ok: #78d49b;
+      --warn: #ffd37a;
+      --bad: #ff8f8f;
+      --border: rgba(255,255,255,0.1);
+    }
+    * { box-sizing: border-box; }
+	body {
+	  margin: 0;
+	  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+	  background: #0b1020 !important;
+	  color: #eef3ff !important;
+	}
+    .wrap {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 18px 40px;
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 30px;
+      line-height: 1.1;
+      color: #880088;
+    }
+    p.lead {
+      margin: 0 0 24px;
+      color: var(--muted);
+      max-width: 860px;
+      color: #885588;
+    }
+	.grid {
+	  display: grid;
+	  grid-template-columns: 1fr;
+	  gap: 18px;
+	  align-items: start;
+	}
+
+	@media (max-width: 1100px) {
+	  .grid {
+		grid-template-columns: 1fr;
+	  }
+}
+    .panel {
+      background: rgba(18,25,51,0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      backdrop-filter: blur(6px);
+    }
+    label {
+      display: block;
+      margin: 0 0 6px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    input, textarea, select, button {
+      font: inherit;
+    }
+    input[type="text"], input[type="number"], textarea, select {
+      width: 100%;
+      color: var(--text);
+      background: var(--panel-2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+    }
+    textarea {
+      min-height: 180px;
+      resize: vertical;
+      line-height: 1.4;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .row3 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 2fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .row5 {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    button {
+      appearance: none;
+      border: 0;
+      border-radius: 12px;
+      background: var(--accent);
+      color: #08101f;
+      font-weight: 700;
+      padding: 12px 16px;
+      cursor: pointer;
+    }
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .hint {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 12px;
+      line-height: 1.45;
+    }
+    .status {
+      margin-bottom: 14px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      white-space: pre-wrap;
+    }
+    .summary {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+    }
+    .chip {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      font-size: 14px;
+    }
+    th {
+      color: var(--muted);
+      background: rgba(255,255,255,0.03);
+      font-weight: 600;
+    }
+    tr:last-child td {
+      border-bottom: 0;
+    }
+    .location-card {
+      margin-top: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+      background: rgba(255,255,255,0.02);
+    }
+    .location-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 14px;
+      background: rgba(255,255,255,0.03);
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .location-title {
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .location-meta {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+    .location-body {
+      padding: 12px 14px 14px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 999px;
+      background: rgba(119,179,255,0.14);
+      border: 1px solid rgba(119,179,255,0.28);
+      font-size: 12px;
+      color: #dbeaff;
+    }
+    .tiny {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .warn { color: var(--warn); }
+    .ok { color: var(--ok); }
+    .bad { color: var(--bad); }
+    code {
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
+    @media (max-width: 950px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Species Detections by Location</h1>
+    <p class="lead">
+      The page geocodes each location, creates a area bounding box around it, then asks BirdWeather for species data.
+      <br><br> Enter Species ID below:-
+      <br> ...a few useful UK migrant IDs; Swift: 551, Swallow: 397, House Martin: 119, Cuckoo: 155.
+      <br> ...For code/station testing; Robin: 6
+      <br>
+      
+    </p>
+
+    <div class="grid">
+      <div class="panel">
+        <label for="endpoint">BirdWeather GraphQL endpoint</label>
+        <input id="endpoint" type="text" value="https://app.birdweather.com/graphql" />
+
+        <div class="row5">
+          <div>
+            <label for="days">Days back</label>
+            <input id="days" type="number" min="1" max="3650" value="1" disabled />
+          </div>
+          <div>
+            <label for="radiusKm">Area Radius (miles)</label>
+            <input id="radiusKm" type="number" min="0.5" max="100" step="0.5" value="12" />
+          </div>
+        
+
+
+          <div>
+            <label for="stationLimit">Show area stations (max)</label>
+            <input id="stationLimit" type="number" min="1" max="100" value="10" />
+          </div>
+          <div>
+			  <label for="minConfidence">Min confidence (%)</label>
+			  <input id="minConfidence" type="number" min="0" max="100" value="80" />
+			</div>
+			<div>
+			  <label for="resultLimit">Detection limit</label>
+			  <input id="resultLimit" type="number" min="10" max="2000" value="500" />
+			</div>
+			
+
+        </div>
+        
+        <div class="row">
+		  <div>
+			<label for="locations">Post Code or Location names; one per line</label>
+			<textarea id="locations" placeholder="Aldwick&#10;Brighton&#10;Southampton"></textarea>
+		  </div>
+
+		  <div>
+			<label for="speciesList">Species IDs (one per line)</label>
+			<textarea id="speciesList" placeholder="155&#10;397&#10;551"></textarea>
+		  </div>
+		</div>
+
+        <div class="actions">
+          <button id="runBtn">Fetch Bird Data</button>
+          <button id="exampleBtn" class="secondary">Load default locations</button>
+          <button id="csvBtn" class="secondary">Download CSV</button>
+        </div>
+
+        <div class="hint">
+          SteveDee 15-Apr-2026
+          <br>
+          I created this page to specifically check for the return of migrant species to England, such as the swift & cuckoo.
+          <br><br>
+          Enter a bird ID, one on more locations (by post-code or name), set an area radius, & then 'Fetch bird data'.          <br>          
+          <br>
+          This simple site utilises the GraphQL API to access BirdWeather data from acoustic bird monitoring stations,
+          mainly built around BirdNet-Pi & PUC systems.
+          <br><br>
+          The official BirdWeather website is: 
+          <a href="https://app.birdweather.com/" target="_blank" rel="noopener">https://app.birdweather.com</a>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div id="status" class="status">Ready.</div>
+        <div id="summary" class="summary"></div>
+        <div id="results"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const endpointEl = document.getElementById("endpoint");
+    const speciesListEl = document.getElementById("speciesList");
+    const daysEl = document.getElementById("days");
+    const radiusKmEl = document.getElementById("radiusKm");
+    const stationLimitEl = document.getElementById("stationLimit");
+    const binGroupEl = "1440";
+    const locationsEl = document.getElementById("locations");
+    const runBtn = document.getElementById("runBtn");
+    const exampleBtn = document.getElementById("exampleBtn");
+    const csvBtn = document.getElementById("csvBtn");
+    const statusEl = document.getElementById("status");
+    const summaryEl = document.getElementById("summary");
+    const resultsEl = document.getElementById("results");
+    const defaultLocations = [
+                  "Aldwick",
+                  "Brighton",
+                  "Southampton"
+     ];
+
+    let latestRows = [];
+    let speciesIds = [];
+    
+// --- Unit conversion helpers ---
+function kmToMiles(km) {
+  return km * 0.621371;
+}
+
+function milesToKm(miles) {
+  return miles / 0.621371;
+}
+
+    exampleBtn.addEventListener("click", () => {
+      locationsEl.value = defaultLocations.join("\n");
+    });
+
+    csvBtn.addEventListener("click", () => {
+      if (!latestRows.length) {
+        alert("No results to export yet.");
+        return;
+      }
+      const headers = [
+        "requested_location",
+        "resolved_display_name",
+        "latitude",
+        "longitude",
+        "radius_miles",
+        "common_swift_total_count",
+        "nearby_station_count",
+        "top_station_names"
+      ];
+      const lines = [headers.join(",")];
+      for (const row of latestRows) {
+        const vals = headers.map((key) => csvEscape(row[key] ?? ""));
+        lines.push(vals.join(","));
+      }
+      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "Common-swift-location-counts.csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    runBtn.addEventListener("click", run);
+
+    async function run() {
+      const endpoint = endpointEl.value.trim();
+      const speciesIds = speciesListEl.value
+		  .split(/\n|,/g)
+		  .map(s => s.trim())
+		  .filter(Boolean);
+		  
+
+// ✅ ADD THIS BLOCK RIGHT HERE ↓↓↓
+const speciesMeta = await Promise.all(
+  speciesIds.map(id => fetchSpeciesMeta(endpoint, id))
+);
+
+//let speciesNames = speciesMeta.map(s => s.commonName);
+		  
+      const days = Number(daysEl.value);
+      const radiusMiles = Number(radiusKmEl.value);
+      const radiusKm = milesToKm(radiusMiles);
+      const stationLimit = Number(stationLimitEl.value);
+      const binGroup = Number(binGroupEl.value);
+      const minConfidence = Number(document.getElementById("minConfidence").value) / 100;
+      //const resultLimit = Number(document.getElementById("resultLimit").value);
+      const rawLimit = document.getElementById("resultLimit").value;
+
+const resultLimit = Number(document.getElementById("resultLimit").value) || 500;
+
+console.log("FINAL first value being sent:", resultLimit, typeof resultLimit);
+
+console.log("resultLimit:", resultLimit);
+
+      let speciesCommonName = "";
+      
+      console.log("RUN STARTED");
+      console.log("minConfidence from UI:", minConfidence);
+      console.log("result limit:", resultLimit);
+      console.log("raw limit:", document.getElementById("resultLimit")?.value);
+
+      const requestedLocations = locationsEl.value
+        .split(/\n|,/g)
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      latestRows = [];
+      summaryEl.innerHTML = "";
+      resultsEl.innerHTML = "";
+
+      if (!endpoint) return setStatus("Please enter a GraphQL endpoint.", "bad");
+      if (!speciesIds.length) return setStatus("Please enter at least one species ID.", "bad");
+      if (!requestedLocations.length) return setStatus("Please enter at least one location name.", "bad");
+
+      try {
+        const results = [];
+        let speciesNames = [];
+        for (let i = 0; i < requestedLocations.length; i++) {
+          const requested = requestedLocations[i];
+          setStatus(`Geocoding ${i + 1} of ${requestedLocations.length}: ${requested}`);
+//new
+
+// --- FETCH SPECIES METADATA (names) ---
+const speciesMeta = await Promise.all(
+  speciesIds.map(id =>
+    graphqlRequest(endpoint, `
+      query ($id: ID!) {
+        species(id: $id) {
+          commonName
+          scientificName
+        }
+      }
+    `, { id })
+  )
+);
+
+// Extract names safely
+speciesNames = speciesMeta.map(r =>
+  r?.species?.commonName || "Unknown"
+);
+
+console.log("speciesNames (from metadata):", speciesNames);
+//end
+          const geo = await geocodeLocation(requested);
+          if (!geo) {
+            results.push({
+              requestedLocation: requested,
+              displayName: "",
+              lat: null,
+              lon: null,
+              totalCount: null,
+              stations: [],
+              bins: [],
+              error: "Could not geocode location"
+            });
+            continue;
+          }
+
+          setStatus(`Querying BirdWeather for ${requested}...`);
+
+const speciesResults = await Promise.all(
+  speciesIds.map(id =>
+    fetchSpeciesCountsNearLocation(
+      endpoint,
+      id,
+      days,
+      binGroup,
+      geo.lat,
+      geo.lon,
+      radiusKm,
+      minConfidence
+    )
+  )
+);
+
+//		  speciesNames = speciesResults.map(r => r.commonName || "Unknown");
+          const stationMap = {};
+
+		speciesResults.forEach((bw, idx) => {
+		  (bw.stations || []).forEach(s => {
+			const key = s.station.id;
+
+			if (!stationMap[key]) {
+			  stationMap[key] = {
+				station: s.station,
+				counts: new Array(speciesIds.length).fill(0)
+			  };
+			}
+
+			stationMap[key].counts[idx] = s.count || 0;
+		  });
+		});
+
+		const allStations = Object.values(stationMap);
+
+		const totalCount = allStations.reduce((sum, s) =>
+		  sum + s.counts.reduce((a, b) => a + b, 0), 0
+		);
+
+		const trimmedStations = allStations.slice(0, stationLimit);
+
+          if (!speciesCommonName && speciesResults[0]?.commonName) {
+				  speciesCommonName = speciesResults[0].commonName;
+				}
+
+          results.push({
+            requestedLocation: requested,
+            displayName: geo.display_name,
+            lat: geo.lat,
+            lon: geo.lon,
+            totalCount,
+            stations: trimmedStations,
+            error: null
+          });
+        }
+
+        latestRows = results.map(r => ({
+          requested_location: r.requestedLocation,
+          resolved_display_name: r.displayName || "",
+          latitude: r.lat ?? "",
+          longitude: r.lon ?? "",
+          radius_miles: Math.round(kmToMiles(radiusKm)),
+          common: r.totalCount ?? "",
+          nearby_station_count: r.stations?.length ?? 0,
+          top_station_names: (r.stations || []).map(s => `${s.station.name} (${s.counts.join("|")})`).join(" | ")
+        }));
+
+        renderSummary(results, days, radiusKm, speciesIds, speciesCommonName);
+        renderResults(results, days, radiusKm, binGroup, speciesIds, speciesNames);
+        const failures = results.filter(r => r.error).length;
+        setStatus(
+          failures
+            ? `Done. ${results.length - failures} location(s) returned data, ${failures} had issues.`
+            : `Done. Retrieved data for ${results.length} location(s).`,
+          failures ? "warn" : "ok"
+        );
+      } catch (err) {
+        console.error(err);
+        setStatus(
+          "Request failed.\n\n" + (err?.message || String(err)),
+          "bad"
+        );
+      }
+    }
+
+    async function geocodeLocation(query) {
+      const url = new URL("https://nominatim.openstreetmap.org/search");
+      url.searchParams.set("q", query);
+      url.searchParams.set("format", "jsonv2");
+      url.searchParams.set("limit", "1");
+
+      const res = await fetch(url.toString(), {
+        headers: {
+          "Accept": "application/json"
+        }
+      });
+      if (!res.ok) {
+        throw new Error(`Geocoding failed: HTTP ${res.status} ${res.statusText}`);
+      }
+      const json = await res.json();
+      if (!json.length) return null;
+      return {
+        lat: Number(json[0].lat),
+        lon: Number(json[0].lon),
+        display_name: json[0].display_name
+      };
+    }
+
+    function makeBoundingBox(lat, lon, radiusKm) {
+      const latDelta = radiusKm / 111;
+      const lonDelta = radiusKm / (111 * Math.cos((lat * Math.PI) / 180) || 1);
+
+      return {
+        ne: { lat: lat + latDelta, lon: lon + lonDelta },
+        sw: { lat: lat - latDelta, lon: lon - lonDelta }
+      };
+    }
+
+    async function graphqlRequest(endpoint, query, variables) {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ query, variables })
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status} ${res.statusText}`);
+      }
+
+      const json = await res.json();
+      if (json.errors?.length) {
+        throw new Error(json.errors.map(e => e.message).join("\n"));
+      }
+      return json.data;
+    }
+
+async function fetchSpeciesCountsNearLocation(
+  endpoint,
+  speciesId,
+  days,
+  binGroup,
+  lat,
+  lon,
+  radiusKm,
+  minConfidence
+) {
+  const bbox = makeBoundingBox(lat, lon, radiusKm);
+
+const query = `
+  query DetectionsNearLocation(
+    $speciesId: ID!,
+    $ne: InputLocation,
+    $sw: InputLocation,
+    $confidenceGte: Float,
+    $first: Int
+  ) {
+    detections(
+      speciesId: $speciesId,
+      ne: $ne,
+      sw: $sw,
+      confidenceGte: $confidenceGte,
+      first: $first
+    ) {
+      nodes {
+        confidence
+        station {
+          id
+          name
+          location
+          state
+          country
+        }
+      }
+    }
+  }
+`;
+
+  const data = await graphqlRequest(endpoint, query, {
+    speciesId,
+    ne: bbox.ne,
+    sw: bbox.sw,
+    confidenceGte: minConfidence,
+    first: Number(resultLimit)
+  });
+
+  const detections = data?.detections?.nodes || [];
+
+  // Build counts per station
+  const stationMap = {};
+
+  detections.forEach(d => {
+    const s = d.station;
+    if (!s || !s.id) return;
+
+    if (!stationMap[s.id]) {
+      stationMap[s.id] = {
+        station: s,
+        count: 0
+      };
+    }
+
+    stationMap[s.id].count++;
+  });
+
+  const stations = Object.values(stationMap);
+
+  return {
+    bins: [],
+    stations,
+    commonName: "",
+    scientificName: ""
+  };
+}
+
+   
+	function renderSummary(results, days, radiusKm, speciesCommonName) {
+
+	  const total = results
+		.filter(r => typeof r.totalCount === "number")
+		.reduce((sum, r) => sum + r.totalCount, 0);
+
+	  const ok = results.filter(r => !r.error).length;
+	  const failed = results.filter(r => r.error).length;
+	  const stations = results.reduce((sum, r) => sum + (r.stations?.length || 0), 0);
+
+	  summaryEl.innerHTML = "";
+
+	  for (const item of [
+		`${results.length} requested`,
+		`${ok} resolved`,
+		`${failed} failed`,
+		`${total} total detections`,
+		`${stations} area stations`,
+		`24h default period`,
+		`${Math.round(kmToMiles(radiusKm))} mile radius`,
+		`Species: ${speciesIds.join(", ")}`
+	  ]) {
+		const el = document.createElement("div");
+		el.className = "chip";
+		el.textContent = item;
+		summaryEl.appendChild(el);
+	  }
+	}
+	
+	///new
+async function fetchSpeciesMeta(endpoint, speciesId) {
+  const query = `
+    query GetSpecies($speciesId: ID!) {
+      species(id: $speciesId) {
+        commonName
+        scientificName
+      }
+    }
+  `;
+
+  const data = await graphqlRequest(endpoint, query, { speciesId });
+
+  return {
+    commonName: data?.species?.commonName || "Unknown",
+    scientificName: data?.species?.scientificName || ""
+  };
+}
+	
+	///end
+
+	function renderResults(results, days, radiusKm, binGroup, speciesIds, speciesNames) {
+      resultsEl.innerHTML = "";
+		console.log("speciesIds:", speciesIds);
+      const table = document.createElement("table");
+      table.innerHTML = `
+        <thead>
+          <tr>
+            <th>Requested location</th>
+            <th>Resolved place</th>
+            <th>detection count</th>
+            <th>area stations</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${results.map(r => `
+            <tr>
+              <td>${escapeHtml(r.requestedLocation)}</td>
+              <td>${escapeHtml(r.displayName || "Not resolved")}</td>
+              <td>${r.totalCount == null ? "—" : escapeHtml(String(r.totalCount))}</td>
+              <td>${escapeHtml(String(r.stations?.length || 0))}</td>
+              <td>${r.error ? escapeHtml(r.error) : "OK"}</td>
+            </tr>
+          `).join("")}
+        </tbody>
+      `;
+      resultsEl.appendChild(table);
+
+      for (const r of results) {
+		const speciesHeaders = speciesNames.map(name => `<th>${escapeHtml(name)}</th>`).join("");
+		const stationRows = (r.stations || []).map(s => `
+		
+		  <tr>
+			<td>${escapeHtml(s.station.name || "")}</td>
+			${s.counts.map(c => `<td>${escapeHtml(String(c || 0))}</td>`).join("")}
+		  </tr>
+		`).join("");
+
+        const card = document.createElement("div");
+        card.className = "location-card";
+        card.innerHTML = `
+          <div class="location-head">
+            <div>
+              <div class="location-title">${escapeHtml(r.requestedLocation)}</div>
+              <div class="location-meta">
+                ${r.displayName ? escapeHtml(r.displayName) : "Not resolved"}
+                ${r.lat != null && r.lon != null ? ` • ${escapeHtml(r.lat.toFixed(5))}, ${escapeHtml(r.lon.toFixed(5))}` : ""}
+              </div>
+            </div>
+            <div>
+              ${r.totalCount == null
+                ? `<span class="badge">No data</span>`
+                : `<span class="badge">${escapeHtml(String(r.totalCount))} detections within ${Math.round(kmToMiles(radiusKm))} miles</span>`}
+            </div>
+          </div>
+          <div class="location-body">
+            ${r.error ? `<div class="bad">${escapeHtml(r.error)}</div>` : ""}
+            <div class="tiny" style="margin-bottom:10px">Based on BirdWeather stations found within a ${Math.round(kmToMiles(radiusKm))} mile box around the geocoded location over BirdWeather's default period of the last 24 hours.</div>
+            <div style="margin-top:8px">
+              <div class="tiny" style="margin-bottom:8px">area stations</div>
+              <table>
+                <thead>
+					<tr>
+					  <th>Station</th>
+					  ${speciesHeaders}
+					</tr>
+                </thead>
+                <tbody>
+                  ${stationRows || `<tr><td colspan="${(speciesIds?.length || 0) + 1}">No area stations returned.</td></tr>`}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        `;
+        resultsEl.appendChild(card);
+      }
+    }
+
+    function setStatus(text, tone = "") {
+      statusEl.textContent = text;
+      statusEl.className = "status";
+      if (tone) statusEl.classList.add(tone);
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function csvEscape(value) {
+      const s = String(value);
+      if (/[",\n]/.test(s)) return `"${s.replaceAll('"', '""')}"`;
+      return s;
+    }
+    
+    window.addEventListener("DOMContentLoaded", () => {
+        speciesListEl.value = ["155", "397", "551"].join("\n");
+        locationsEl.value = defaultLocations.join("\n");
+        run(); // auto-fetch on startup
+    });
+  </script>
+</body>
+</html>
