@@ -79,7 +79,7 @@
     label {
       display: block;
       margin: 0 0 6px;
-      font-size: 14px;
+      font-size: 12px;
       color: var(--muted);
     }
     input, textarea, select, button {
@@ -104,7 +104,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-top: 12px;
-      font-size: 14px;
+      font-size: 12px;
     }
     .row3 {
       display: grid;
@@ -289,7 +289,7 @@
 
 		  <div>
 			<label for="speciesList">enter BirdWeather Species IDs (one per line, >5 may exceed display width)</label>
-			<textarea id="speciesList" placeholder="62&#10;155&#10;119&#10;253&#10;397&#10;551&#10;95"></textarea>
+			<textarea id="speciesList" placeholder="62&#10;155&#10;119&#10;397&#10;551&#10;95"></textarea>
 		  </div>
 		</div>
 
@@ -313,7 +313,7 @@
 
 
           <div>
-            <label for="stationLimit">Show area stations (max)</label>
+            <label for="stationLimit">Area stations (max)</label>
             <input id="stationLimit" type="number" min="1" max="20" value="10" />
           </div>
           <div>
@@ -341,7 +341,7 @@
           <br>
           I created this page to specifically check for the return of migrant species to England, such as the swift.
           <br><br>
-          Enter a bird ID, one on more locations (by post-code or name), set an  area radius, & then 'Fetch Data'.          <br>          
+          Enter a bird ID, one on more locations (by post-code or name), set an area radius, & then 'Fetch Data'.          <br>          
           <br>
           This simple site utilises the GraphQL API to access BirdWeather data from acoustic bird monitoring stations,
           mainly built around BirdNet-Pi & PUC systems.
@@ -395,7 +395,6 @@
 		  .map(s => s.trim())
 		  .filter(Boolean);
 		  
-
 
 	const speciesMeta = await Promise.all(
 	  speciesIds.map(id => fetchSpeciesMeta(endpoint, id))
@@ -862,8 +861,10 @@ function simplifySpeciesName(name) {   //simplify common names
 
 	  const title = document.createElement("div");
 	  title.style.margin = "14px 0 6px";
-	  title.style.fontWeight = "400";
-	  title.textContent = "Combined Total Detections";
+	  title.style.fontSize = "16px";
+	  title.style.fontWeight = "bold";
+	  title.style.color = "#5555ff";
+	  title.textContent = "Combined Total Detections by Species";
 
 	  resultsEl.appendChild(title);
 	  resultsEl.appendChild(totalsTable);
@@ -897,9 +898,9 @@ function simplifySpeciesName(name) {   //simplify common names
           </div>
           <div class="location-body">
             ${r.error ? `<div class="bad">${escapeHtml(r.error)}</div>` : ""}
-            <div class="tiny" style="margin-bottom:10px">Based on BirdWeather stations found within a ${Math.round(kmToMiles(radiusKm))} mile radius around the geocoded location over BirdWeather's default period of the last 24 hours.</div>
-            <div style="margin-top:8px">
-              <div class="tiny" style="margin-bottom:8px">area stations</div>
+            <div class="tiny" style="margin-bottom:10px">BirdWeather stations reporting data within a ${Math.round(kmToMiles(radiusKm))} mile radius of the geocoded location, for last 24 hours.</div>
+            <div style="margin-top:9px">
+
               <table>
                 <thead>
 					<tr>
@@ -940,7 +941,7 @@ function simplifySpeciesName(name) {   //simplify common names
     }
     
     window.addEventListener("DOMContentLoaded", () => {
-        speciesListEl.value = ["62", "155", "119", "253", "397", "551", "95"].join("\n");
+        speciesListEl.value = ["62", "155", "119", "397", "551", "95"].join("\n");
         locationsEl.value = defaultLocations.join("\n");
         //run(); // auto-fetch on startup
     });
