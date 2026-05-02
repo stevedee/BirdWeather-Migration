@@ -27,24 +27,24 @@
 	  margin: 0;
 	  font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 	  background: #0b1020 !important;
-	  color: #eef3ff !important;
+	  color: #eebbff !important;
 	}
     .wrap {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 28px 18px 40px;
+      padding: 28px 8px 40px;
     }
     h1 {
       margin: 0 0 8px;
       font-size: 30px;
       line-height: 1.1;
-      color: #880088;
+      color: #22aaff;
     }
     p.lead {
       margin: 0 0 24px;
       color: var(--muted);
       max-width: 860px;
-      color: #885588;
+      color: #5588ff;
     }
 	.grid {
 	  display: grid;
@@ -63,8 +63,19 @@
       border: 1px solid var(--border);
       border-radius: 16px;
       padding: 16px;
+      font-size: 14px;
       backdrop-filter: blur(6px);
     }
+    
+    .panel-x {
+      background: rgba(18,25,51,0.9);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 10px;
+      backdrop-filter: blur(6px);
+    }
+    
     label {
       display: block;
       margin: 0 0 6px;
@@ -84,7 +95,7 @@
       outline: none;
     }
     textarea {
-      min-height: 180px;
+      min-height: 100px;
       resize: vertical;
       line-height: 1.4;
     }
@@ -93,19 +104,30 @@
       grid-template-columns: 1fr 1fr;
       gap: 12px;
       margin-top: 12px;
+      font-size: 14px;
     }
     .row3 {
       display: grid;
       grid-template-columns: 1fr 1fr 2fr;
       gap: 12px;
       margin-top: 12px;
+      font-size: 14px;
     }
-    .row5 {
+    .row6 {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+      grid-template-columns: 2fr 1fr 2fr 2fr 2fr 2fr;
       gap: 12px;
       margin-top: 12px;
+      font-size: 14px;
     }
+
+	input[type="checkbox"] {
+	  width: 18px;
+	  height: 18px;
+	  accent-color: var(--accent);
+	  cursor: pointer;
+	}
+
     button {
       appearance: none;
       border: 0;
@@ -147,6 +169,13 @@
       gap: 12px;
       flex-wrap: wrap;
       margin-bottom: 16px;
+    }
+    .results {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      color: #22aaff
     }
     .chip {
       background: rgba(255,255,255,0.05);
@@ -235,40 +264,61 @@
 </head>
 <body>
   <div class="wrap">
-    <h1>Species Detections by Location</h1>
+    <h1>Species Detections by Location using BirdWeather</h1>
     <p class="lead">
-      The page geocodes each location, creates a area bounding box around it, then asks BirdWeather for species data.
-      <br><br> Enter Species ID below:-
-      <br> ...a few useful UK migrant IDs; Swift: 551, Swallow: 397, House Martin: 119, Cuckoo: 155.
-      <br> ...For code/station testing; Robin: 6
+      This page geocodes each location, creates a circular area bounding box around it, then requests species data.
+      <br>
+      <br> Useful UK migrant BirdWeather IDs; Swift: 551, Swallow: 397, House Martin: 119, Cuckoo: 155, White Wagtail: 95, Blackcap: 62, Nightingale: 253
+      <br> ...for code/station testing, use Robin: 6
       <br>
       
     </p>
 
     <div class="grid">
-      <div class="panel">
-        <label for="endpoint">BirdWeather GraphQL endpoint</label>
-        <input id="endpoint" type="text" value="https://app.birdweather.com/graphql" />
+      <div class="panel-x">
+ <!---        <label for="endpoint">BirdWeather GraphQL endpoint</label>   --->
+        <input id="endpoint" type="text" value="https://app.birdweather.com/graphql" /> 
 
-        <div class="row5">
+
+        
+        <div class="row">
+		  <div>
+			<label for="locations">enter Post Code or Location names (one per line, 10 max)</label>
+			<textarea id="locations" placeholder="Aldwick&#10;Brighton&#10;Southampton"></textarea>
+		  </div>
+
+		  <div>
+			<label for="speciesList">enter BirdWeather Species IDs (one per line, >5 may exceed display width)</label>
+			<textarea id="speciesList" placeholder="62&#10;155&#10;119&#10;253&#10;397&#10;551&#10;95"></textarea>
+		  </div>
+		</div>
+
+
+
+        <div class="row6">
+			
+        <div class="actions">
+          <button id="runBtn">Fetch Data</button>
+        </div>
+			
           <div>
-            <label for="days">Days back</label>
-            <input id="days" type="number" min="1" max="3650" value="1" disabled />
+			<label for="exportCsv">Export CSV</label>
+			<input id="exportCsv" type="checkbox" />
           </div>
           <div>
             <label for="radiusKm">Area Radius (miles)</label>
-            <input id="radiusKm" type="number" min="0.5" max="100" step="0.5" value="12" />
+            <input id="radiusKm" type="number" min="1" max="100" step="1" value="12" />
           </div>
         
 
 
           <div>
             <label for="stationLimit">Show area stations (max)</label>
-            <input id="stationLimit" type="number" min="1" max="100" value="10" />
+            <input id="stationLimit" type="number" min="1" max="20" value="10" />
           </div>
           <div>
 			  <label for="minConfidence">Min confidence (%)</label>
-			  <input id="minConfidence" type="number" min="0" max="100" value="80" />
+			  <input id="minConfidence" type="number" min="30" max="100" value="80" />
 			</div>
 			<div>
 			  <label for="resultLimit">Detection limit</label>
@@ -277,31 +327,21 @@
 			
 
         </div>
-        
-        <div class="row">
-		  <div>
-			<label for="locations">Post Code or Location names; one per line</label>
-			<textarea id="locations" placeholder="Aldwick&#10;Brighton&#10;Southampton"></textarea>
-		  </div>
 
-		  <div>
-			<label for="speciesList">Species IDs (one per line)</label>
-			<textarea id="speciesList" placeholder="155&#10;397&#10;551"></textarea>
-		  </div>
-		</div>
+      </div>
 
-        <div class="actions">
-          <button id="runBtn">Fetch Bird Data</button>
-          <button id="exampleBtn" class="secondary">Load default locations</button>
-          <button id="csvBtn" class="secondary">Download CSV</button>
-        </div>
-
+      <div class="panel">
+        <div id="status" class="status">>>>Ready</div>
+        <div id="summary" class="summary"></div>
+        <div id="results" class="results"></div>
+      </div>
+      
         <div class="hint">
           SteveDee 15-Apr-2026
           <br>
-          I created this page to specifically check for the return of migrant species to England, such as the swift & cuckoo.
+          I created this page to specifically check for the return of migrant species to England, such as the swift.
           <br><br>
-          Enter a bird ID, one on more locations (by post-code or name), set an area radius, & then 'Fetch bird data'.          <br>          
+          Enter a bird ID, one on more locations (by post-code or name), set an  area radius, & then 'Fetch Data'.          <br>          
           <br>
           This simple site utilises the GraphQL API to access BirdWeather data from acoustic bird monitoring stations,
           mainly built around BirdNet-Pi & PUC systems.
@@ -309,27 +349,20 @@
           The official BirdWeather website is: 
           <a href="https://app.birdweather.com/" target="_blank" rel="noopener">https://app.birdweather.com</a>
         </div>
-      </div>
-
-      <div class="panel">
-        <div id="status" class="status">Ready.</div>
-        <div id="summary" class="summary"></div>
-        <div id="results"></div>
-      </div>
+      
     </div>
   </div>
 
   <script>
     const endpointEl = document.getElementById("endpoint");
     const speciesListEl = document.getElementById("speciesList");
-    const daysEl = document.getElementById("days");
+
     const radiusKmEl = document.getElementById("radiusKm");
     const stationLimitEl = document.getElementById("stationLimit");
+    const exportCsvEl = document.getElementById("exportCsv");    
     const binGroupEl = "1440";
     const locationsEl = document.getElementById("locations");
     const runBtn = document.getElementById("runBtn");
-    const exampleBtn = document.getElementById("exampleBtn");
-    const csvBtn = document.getElementById("csvBtn");
     const statusEl = document.getElementById("status");
     const summaryEl = document.getElementById("summary");
     const resultsEl = document.getElementById("results");
@@ -342,47 +375,16 @@
     let latestRows = [];
     let speciesIds = [];
     
-// --- Unit conversion helpers ---
-function kmToMiles(km) {
-  return km * 0.621371;
-}
+	// --- Unit conversion helpers ---
+	function kmToMiles(km) {
+	  return km * 0.621371;
+	}
 
-function milesToKm(miles) {
-  return miles / 0.621371;
-}
+	function milesToKm(miles) {
+	  return miles / 0.621371;
+	}
 
-    exampleBtn.addEventListener("click", () => {
-      locationsEl.value = defaultLocations.join("\n");
-    });
 
-    csvBtn.addEventListener("click", () => {
-      if (!latestRows.length) {
-        alert("No results to export yet.");
-        return;
-      }
-      const headers = [
-        "requested_location",
-        "resolved_display_name",
-        "latitude",
-        "longitude",
-        "radius_miles",
-        "common_swift_total_count",
-        "nearby_station_count",
-        "top_station_names"
-      ];
-      const lines = [headers.join(",")];
-      for (const row of latestRows) {
-        const vals = headers.map((key) => csvEscape(row[key] ?? ""));
-        lines.push(vals.join(","));
-      }
-      const blob = new Blob([lines.join("\n")], { type: "text/csv;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "Common-swift-location-counts.csv";
-      a.click();
-      URL.revokeObjectURL(url);
-    });
 
     runBtn.addEventListener("click", run);
 
@@ -394,27 +396,23 @@ function milesToKm(miles) {
 		  .filter(Boolean);
 		  
 
-// ✅ ADD THIS BLOCK RIGHT HERE ↓↓↓
-const speciesMeta = await Promise.all(
-  speciesIds.map(id => fetchSpeciesMeta(endpoint, id))
-);
 
-//let speciesNames = speciesMeta.map(s => s.commonName);
+	const speciesMeta = await Promise.all(
+	  speciesIds.map(id => fetchSpeciesMeta(endpoint, id))
+	);
 		  
-      const days = Number(daysEl.value);
       const radiusMiles = Number(radiusKmEl.value);
       const radiusKm = milesToKm(radiusMiles);
       const stationLimit = Number(stationLimitEl.value);
       const binGroup = Number(binGroupEl.value);
       const minConfidence = Number(document.getElementById("minConfidence").value) / 100;
-      //const resultLimit = Number(document.getElementById("resultLimit").value);
       const rawLimit = document.getElementById("resultLimit").value;
 
-const resultLimit = Number(document.getElementById("resultLimit").value) || 500;
+      const resultLimit = Number(document.getElementById("resultLimit").value) || 500;
 
-console.log("FINAL first value being sent:", resultLimit, typeof resultLimit);
+      console.log("FINAL first value being sent:", resultLimit, typeof resultLimit);
 
-console.log("resultLimit:", resultLimit);
+      console.log("resultLimit:", resultLimit);
 
       let speciesCommonName = "";
       
@@ -442,29 +440,29 @@ console.log("resultLimit:", resultLimit);
         for (let i = 0; i < requestedLocations.length; i++) {
           const requested = requestedLocations[i];
           setStatus(`Geocoding ${i + 1} of ${requestedLocations.length}: ${requested}`);
-//new
 
-// --- FETCH SPECIES METADATA (names) ---
-const speciesMeta = await Promise.all(
-  speciesIds.map(id =>
-    graphqlRequest(endpoint, `
-      query ($id: ID!) {
-        species(id: $id) {
-          commonName
-          scientificName
-        }
-      }
-    `, { id })
-  )
-);
 
-// Extract names safely
+	// --- FETCH SPECIES METADATA (names) ---
+	const speciesMeta = await Promise.all(
+	  speciesIds.map(id =>
+		graphqlRequest(endpoint, `
+		  query ($id: ID!) {
+			species(id: $id) {
+			  commonName
+			  scientificName
+			}
+		  }
+		`, { id })
+	  )
+	);
+
+	// Extract names safely & drop unnecessary prefixes
 speciesNames = speciesMeta.map(r =>
-  r?.species?.commonName || "Unknown"
+  simplifySpeciesName(r?.species?.commonName || "Unknown")
 );
 
-console.log("speciesNames (from metadata):", speciesNames);
-//end
+	console.log("speciesNames (from metadata):", speciesNames);
+
           const geo = await geocodeLocation(requested);
           if (!geo) {
             results.push({
@@ -482,22 +480,20 @@ console.log("speciesNames (from metadata):", speciesNames);
 
           setStatus(`Querying BirdWeather for ${requested}...`);
 
-const speciesResults = await Promise.all(
-  speciesIds.map(id =>
-    fetchSpeciesCountsNearLocation(
-      endpoint,
-      id,
-      days,
-      binGroup,
-      geo.lat,
-      geo.lon,
-      radiusKm,
-      minConfidence
-    )
-  )
-);
+		const speciesResults = await Promise.all(
+		  speciesIds.map(id =>
+			fetchSpeciesCountsNearLocation(
+			  endpoint,
+			  id,
+			  binGroup,
+			  geo.lat,
+			  geo.lon,
+			  radiusKm,
+			  minConfidence
+			)
+		  )
+		);
 
-//		  speciesNames = speciesResults.map(r => r.commonName || "Unknown");
           const stationMap = {};
 
 		speciesResults.forEach((bw, idx) => {
@@ -549,23 +545,39 @@ const speciesResults = await Promise.all(
           top_station_names: (r.stations || []).map(s => `${s.station.name} (${s.counts.join("|")})`).join(" | ")
         }));
 
-        renderSummary(results, days, radiusKm, speciesIds, speciesCommonName);
-        renderResults(results, days, radiusKm, binGroup, speciesIds, speciesNames);
-        const failures = results.filter(r => r.error).length;
-        setStatus(
-          failures
-            ? `Done. ${results.length - failures} location(s) returned data, ${failures} had issues.`
-            : `Done. Retrieved data for ${results.length} location(s).`,
-          failures ? "warn" : "ok"
-        );
-      } catch (err) {
-        console.error(err);
-        setStatus(
-          "Request failed.\n\n" + (err?.message || String(err)),
-          "bad"
-        );
-      }
-    }
+		// --- NEW: Combined totals per species ---
+		const combinedTotals = new Array(speciesIds.length).fill(0);
+
+		results.forEach(r => {
+		  (r.stations || []).forEach(s => {
+			s.counts.forEach((count, idx) => {
+			  combinedTotals[idx] += count || 0;
+			});
+		  });
+		});
+
+		console.log("combinedTotals:", combinedTotals);
+				renderSummary(results, radiusKm, speciesIds, speciesCommonName);
+				renderResults(results, radiusKm, binGroup, speciesIds, speciesNames, combinedTotals);
+				if (exportCsvEl.checked) {
+					downloadCsvSnapshot(locationsEl, speciesNames, combinedTotals);
+				}
+				
+				const failures = results.filter(r => r.error).length;
+				setStatus(
+				  failures
+					? `Done. ${results.length - failures} location(s) returned data, ${failures} had issues.`
+					: `Done. Retrieved data for ${results.length} location(s).`,
+				  failures ? "warn" : "ok"
+				);
+			  } catch (err) {
+				console.error(err);
+				setStatus(
+				  "Request failed.\n\n" + (err?.message || String(err)),
+				  "bad"
+				);
+			  }
+			}
 
     async function geocodeLocation(query) {
       const url = new URL("https://nominatim.openstreetmap.org/search");
@@ -620,86 +632,85 @@ const speciesResults = await Promise.all(
       return json.data;
     }
 
-async function fetchSpeciesCountsNearLocation(
-  endpoint,
-  speciesId,
-  days,
-  binGroup,
-  lat,
-  lon,
-  radiusKm,
-  minConfidence
-) {
-  const bbox = makeBoundingBox(lat, lon, radiusKm);
+	async function fetchSpeciesCountsNearLocation(
+	  endpoint,
+	  speciesId,
+	  binGroup,
+	  lat,
+	  lon,
+	  radiusKm,
+	  minConfidence
+	) {
+	  const bbox = makeBoundingBox(lat, lon, radiusKm);
 
-const query = `
-  query DetectionsNearLocation(
-    $speciesId: ID!,
-    $ne: InputLocation,
-    $sw: InputLocation,
-    $confidenceGte: Float,
-    $first: Int
-  ) {
-    detections(
-      speciesId: $speciesId,
-      ne: $ne,
-      sw: $sw,
-      confidenceGte: $confidenceGte,
-      first: $first
-    ) {
-      nodes {
-        confidence
-        station {
-          id
-          name
-          location
-          state
-          country
-        }
-      }
-    }
-  }
-`;
+	const query = `
+	  query DetectionsNearLocation(
+		$speciesId: ID!,
+		$ne: InputLocation,
+		$sw: InputLocation,
+		$confidenceGte: Float,
+		$first: Int
+	  ) {
+		detections(
+		  speciesId: $speciesId,
+		  ne: $ne,
+		  sw: $sw,
+		  confidenceGte: $confidenceGte,
+		  first: $first
+		) {
+		  nodes {
+			confidence
+			station {
+			  id
+			  name
+			  location
+			  state
+			  country
+			}
+		  }
+		}
+	  }
+	`;
 
-  const data = await graphqlRequest(endpoint, query, {
-    speciesId,
-    ne: bbox.ne,
-    sw: bbox.sw,
-    confidenceGte: minConfidence,
-    first: Number(resultLimit)
-  });
+	  const data = await graphqlRequest(endpoint, query, {
+		speciesId,
+		ne: bbox.ne,
+		sw: bbox.sw,
+		confidenceGte: minConfidence,
+		first: Number(resultLimit)
+	  });
 
-  const detections = data?.detections?.nodes || [];
+	  const detections = data?.detections?.nodes || [];
 
-  // Build counts per station
-  const stationMap = {};
+	  // Build counts per station
+	  const stationMap = {};
 
-  detections.forEach(d => {
-    const s = d.station;
-    if (!s || !s.id) return;
+	  detections.forEach(d => {
+		const s = d.station;
+		if (!s || !s.id) return;
 
-    if (!stationMap[s.id]) {
-      stationMap[s.id] = {
-        station: s,
-        count: 0
-      };
-    }
+		if (!stationMap[s.id]) {
+		  stationMap[s.id] = {
+			station: s,
+			count: 0
+		  };
+		}
 
-    stationMap[s.id].count++;
-  });
+		stationMap[s.id].count++;
+	  });
 
-  const stations = Object.values(stationMap);
+	  const stations = Object.values(stationMap);
 
-  return {
-    bins: [],
-    stations,
-    commonName: "",
-    scientificName: ""
-  };
-}
+	  return {
+		bins: [],
+		stations,
+		commonName: "",
+		scientificName: ""
+	  };
+	}
 
    
-	function renderSummary(results, days, radiusKm, speciesCommonName) {
+	function renderSummary(results, radiusKm, speciesCommonName) {
 
 	  const total = results
 		.filter(r => typeof r.totalCount === "number")
@@ -728,28 +739,79 @@ const query = `
 	  }
 	}
 	
-	///new
-async function fetchSpeciesMeta(endpoint, speciesId) {
-  const query = `
-    query GetSpecies($speciesId: ID!) {
-      species(id: $speciesId) {
-        commonName
-        scientificName
-      }
-    }
-  `;
 
-  const data = await graphqlRequest(endpoint, query, { speciesId });
+	async function fetchSpeciesMeta(endpoint, speciesId) {
+	  const query = `
+		query GetSpecies($speciesId: ID!) {
+		  species(id: $speciesId) {
+			commonName
+			scientificName
+		  }
+		}
+	  `;
 
-  return {
-    commonName: data?.species?.commonName || "Unknown",
-    scientificName: data?.species?.scientificName || ""
-  };
+	  const data = await graphqlRequest(endpoint, query, { speciesId });
+
+	  return {
+		commonName: data?.species?.commonName || "Unknown",
+		scientificName: data?.species?.scientificName || ""
+	  };
+	}
+	
+function simplifySpeciesName(name) {   //simplify common names
+  if (!name) return "";
+
+  return name
+    .replace(/^(common|european|eurasian|barn)\s+/i, "") // remove prefix at start
+    .trim();
 }
 	
-	///end
+	
+	function downloadCsvSnapshot(locationsEl, speciesNames, combinedTotals) {
+	  if (!combinedTotals || !combinedTotals.length) return;
 
-	function renderResults(results, days, radiusKm, binGroup, speciesIds, speciesNames) {
+	  const now = new Date();
+
+	  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+	  const year = now.getFullYear();
+	  const month = months[now.getMonth()];
+	  const day = String(now.getDate()).padStart(2, "0");
+
+	  const dateStr = `${year}-${month}-${day}`;
+	  const timeStr = `${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+
+	  // Build filename
+	  const locations = locationsEl.value
+		.split(/\n|,/g)
+		.map(s => s.trim())
+		.filter(Boolean)
+		.map(s => s.replace(/\s+/g, "-"));
+
+	  const fileName = `${locations.join("-")}-migrants-${year}-${month}-${day}.csv`;
+
+	  // Build CSV line (lowercase + quoted names)
+	  const parts = [dateStr, timeStr];
+
+	  speciesNames.forEach((name, idx) => {
+		parts.push(`"${name.toLowerCase()}"`);
+		parts.push(String(combinedTotals[idx] || 0));
+	  });
+
+	  const csvLine = parts.join(",");
+
+	  // Download
+	  const blob = new Blob([csvLine], { type: "text/csv;charset=utf-8" });
+	  const url = URL.createObjectURL(blob);
+
+	  const a = document.createElement("a");
+	  a.href = url;
+	  a.download = fileName;
+	  a.click();
+
+	  URL.revokeObjectURL(url);
+	}
+
+	function renderResults(results, radiusKm, binGroup, speciesIds, speciesNames, combinedTotals) {
       resultsEl.innerHTML = "";
 		console.log("speciesIds:", speciesIds);
       const table = document.createElement("table");
@@ -777,6 +839,35 @@ async function fetchSpeciesMeta(endpoint, speciesId) {
       `;
       resultsEl.appendChild(table);
 
+	<!--- NEW: Combined totals table --->
+	if (combinedTotals && combinedTotals.length) {
+	  const totalsTable = document.createElement("table");
+
+	  const headerRow = `
+		<tr>
+		  ${speciesNames.map(name => `<th>${escapeHtml(name)}</th>`).join("")}
+		</tr>
+	  `;
+
+	  const valueRow = `
+		<tr>
+		  ${combinedTotals.map(v => `<td>${escapeHtml(String(v))}</td>`).join("")}
+		</tr>
+	  `;
+
+	  totalsTable.innerHTML = `
+		<thead>${headerRow}</thead>
+		<tbody>${valueRow}</tbody>
+	  `;
+
+	  const title = document.createElement("div");
+	  title.style.margin = "14px 0 6px";
+	  title.style.fontWeight = "400";
+	  title.textContent = "Combined Total Detections";
+
+	  resultsEl.appendChild(title);
+	  resultsEl.appendChild(totalsTable);
+	}
       for (const r of results) {
 		const speciesHeaders = speciesNames.map(name => `<th>${escapeHtml(name)}</th>`).join("");
 		const stationRows = (r.stations || []).map(s => `
@@ -806,7 +897,7 @@ async function fetchSpeciesMeta(endpoint, speciesId) {
           </div>
           <div class="location-body">
             ${r.error ? `<div class="bad">${escapeHtml(r.error)}</div>` : ""}
-            <div class="tiny" style="margin-bottom:10px">Based on BirdWeather stations found within a ${Math.round(kmToMiles(radiusKm))} mile box around the geocoded location over BirdWeather's default period of the last 24 hours.</div>
+            <div class="tiny" style="margin-bottom:10px">Based on BirdWeather stations found within a ${Math.round(kmToMiles(radiusKm))} mile radius around the geocoded location over BirdWeather's default period of the last 24 hours.</div>
             <div style="margin-top:8px">
               <div class="tiny" style="margin-bottom:8px">area stations</div>
               <table>
@@ -849,9 +940,9 @@ async function fetchSpeciesMeta(endpoint, speciesId) {
     }
     
     window.addEventListener("DOMContentLoaded", () => {
-        speciesListEl.value = ["155", "397", "551"].join("\n");
+        speciesListEl.value = ["62", "155", "119", "253", "397", "551", "95"].join("\n");
         locationsEl.value = defaultLocations.join("\n");
-        run(); // auto-fetch on startup
+        //run(); // auto-fetch on startup
     });
   </script>
 </body>
